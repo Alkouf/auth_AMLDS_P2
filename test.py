@@ -1,20 +1,16 @@
-import csv
-from os.path import join
-import numpy as np
+
 from code.lib.projectlib import readdata
 
 
 frames,labels = readdata("data","frames.csv","labels.csv")
 
 
-print(len(frames.keys()))
+labels_aa = []
 
-print(len(labels.keys()))
+for key in labels.keys():
+    for l in labels[key]:
+        labels_aa.append(l)
 
-keys= frames.keys()
 
-
-print(len(frames[keys[0]][0]))
-print(type(frames[keys[0]][0]))
-print(frames[keys[0]][0])
-print(frames[keys[1]][0])
+print(len(labels_aa))
+print(len(set(labels_aa)))

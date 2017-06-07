@@ -12,7 +12,7 @@ def readdata(path, frames, labels):
     """
     The method read the data (frames, csv) and returns the respective dictionaries with VideoIds as keys.
     """
-    with open(join("data", "frames.csv"), "r") as f:
+    with open(join(path, frames), "r") as f:
         reader = csv.reader(f)
         frames_list = list(reader)
         f.close()
@@ -25,7 +25,7 @@ def readdata(path, frames, labels):
         else:
             frames_dict[key].append(row[1:])
 
-    with open(join("data", "labels.csv"), "r") as f:
+    with open(join(path, labels), "r") as f:
         reader = csv.reader(f)
         labels_list = list(reader)
         f.close()
