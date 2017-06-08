@@ -6,7 +6,7 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 from projectlib import readdata
 
-percentage=20
+percentage=60
 
 print("Silhouette Analysis using "+str(percentage)+"% of random selected  instances.")
 frames, labels = readdata("../../data", "frames.csv", "labels.csv")
@@ -21,9 +21,9 @@ instances = np.array(instances_set)
 
 X_rej, X, y_train, y_test = train_test_split(instances, range(len(instances)), test_size=float(percentage)/100, random_state=42)
 text = ""
-range_n_clusters = [37,54,73,78,81,87,88,90,93]
-dimX = 3
-dimY = 3
+range_n_clusters = range(2,102)
+dimX = 10
+dimY = 10
 font = {'fontsize': 8, 'fontweight': "normal", 'verticalalignment': 'baseline', 'horizontalalignment': 'center'}
 f, axarr = plt.subplots(dimX, dimY)
 k = 0
