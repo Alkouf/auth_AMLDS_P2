@@ -1,5 +1,5 @@
 import numpy as np
-with open("extras/silhouette_analysis_results.txt","rb") as f:
+with open("extras/silhouette_analysis_results_9_1_best.txt","rb") as f:
     data =f.readlines()
     f.close()
 
