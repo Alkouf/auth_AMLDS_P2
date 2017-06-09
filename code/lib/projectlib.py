@@ -54,6 +54,13 @@ def metriccalculation(predictions, actual_labels, normalize=True):
     print("Total time for Global Average Prediction: ", end - start)
     return metric
 
+
+def make_train_set():
+    pass
+
+
+
+
 '''''
 def trainmodel(training_set_path, classifier, model_name, model_path="../models"):
     """
