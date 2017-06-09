@@ -13,7 +13,7 @@ from projectlib import readdata
 
 
 # Number of clusters/Number of generated features
-n_clusters = 4
+n_clusters = 100
 
 frames, labels = readdata("../../data", "frames.csv", "labels.csv")
 videoids = frames.keys()
