@@ -1,20 +1,32 @@
+from code.lib.projectlib import make_train_set
 import numpy as np
-with open("extras/silhouette_analysis_results_9_1_best.txt","rb") as f:
-    data =f.readlines()
-    f.close()
-
-print(data)
-
-coefficient=[]
-
-for row in data:
-    print(row)
-    print("____________________")
-    coefficient.append(float(row.split(":")[1].replace("\n","")))
 
 
-coef =np.array(coefficient)
 
-print(coef.argsort())
+X,Y=make_train_set("data","training_dict_f_91.json","labels.csv")
 
-print(coef[coef.argsort()])
+print(X[1])
+print(X[2])
+print(Y[1])
+print(Y[2])
+
+X,Y=make_train_set("data","training_dict_f_91.json","labels.csv",weighted=False)
+
+print(X[1])
+
+print(X[2])
+
+print(Y[1])
+print(Y[2])
+
+
+
+"""
+f= np.array([[0,1,0,0,0,34,17],[0,1,0,0,0,34,17]])
+
+k=f.astype(np.bool)
+l=f.astype(np.bool).astype(np.int)
+print(f)
+print(k)
+print(l)
+"""

@@ -1,7 +1,7 @@
 import time
-from sklearn.externals import joblib
 from os.path import join
 import csv
+import json
 
 import numpy as np
 
@@ -55,10 +55,29 @@ def metriccalculation(predictions, actual_labels, normalize=True):
     return metric
 
 
-def make_train_set():
-    pass
+def make_train_set(path, features_videos, labels, weighted=True):
+    with open(join(path, labels), "r") as f:
+        reader = csv.reader(f)
+        labels_list = list(reader)
+        f.close()
+    labels_dict = {}
+    for row in labels_list:
+        labels_dict[row[0]] = np.array(row[1:])
 
+    with open(join(path, features_videos), "rb") as f:
+        features_dict = json.load(f)
+        f.close()
+    x = []
+    y = []
+    for key in features_dict.keys():
+        x.append(features_dict[key])
+        y.append(labels_dict[key])
+    x_train = np.array(x)
+    y_train = np.array(y)
+    if not weighted:
+        x_train = x_train.astype(np.bool).astype(np.int)
 
+    return x_train, y_train
 
 
 '''''
