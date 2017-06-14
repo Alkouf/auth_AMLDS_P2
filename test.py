@@ -20,6 +20,13 @@ print(Y[1])
 print(Y[2])
 
 
+print "MEDOIDS:"
+X,Y=make_train_set("data","training_dict_6_medoids.json","labels.csv")
+
+print(X[1])
+print(X[2])
+print(Y[1])
+print(Y[2])
 
 """
 f= np.array([[0,1,0,0,0,34,17],[0,1,0,0,0,34,17]])
