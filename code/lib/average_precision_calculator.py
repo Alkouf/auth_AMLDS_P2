@@ -122,7 +122,6 @@ class AveragePrecisionCalculator(object):
       self._total_positives += numpy.size(numpy.where(actuals > 0))
     topk = self._top_n
     heap = self._heap
-
     for i in range(numpy.size(predictions)):
       if topk is None or len(heap) < topk:
         heapq.heappush(heap, (predictions[i], actuals[i]))
@@ -130,6 +129,7 @@ class AveragePrecisionCalculator(object):
         if predictions[i] > heap[0][0]:  # heap[0] is the smallest
           heapq.heappop(heap)
           heapq.heappush(heap, (predictions[i], actuals[i]))
+    print heap
 
   def clear(self):
     """Clear the accumulated predictions."""
@@ -148,6 +148,7 @@ class AveragePrecisionCalculator(object):
       return 0
     predlists = numpy.array(list(zip(*self._heap)))
 
+    print len(predlists[0])
     ap = self.ap_at_n(predlists[0],
                       predlists[1],
                       n=self._top_n,

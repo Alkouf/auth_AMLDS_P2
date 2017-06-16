@@ -120,8 +120,14 @@ def g_a_p2(predictions, Y_validation):
     valcases = len(Y_validation)
     gap = GAP.AveragePrecisionCalculator(20 * valcases)
 
+    predictions = np.array(predictions)
+    Y_validation = np.array(Y_validation)
+
     for i in range(valcases):
-        gap.accumulate(predictions[i], Y_validation[i], num_positives=np.sum(Y_validation[i]))
+        p = predictions[i].argsort()[::-1]
+        predictions[i] = predictions[i][p]
+        Y_validation[i] = Y_validation[i][p]
+        gap.accumulate(predictions[i][:20], Y_validation[i][:20], num_positives=np.sum(Y_validation[i]))
 
     return gap.peek_ap_at_n()
 
