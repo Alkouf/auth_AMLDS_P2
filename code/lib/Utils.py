@@ -105,7 +105,7 @@ def g_a_p(predictions, Y_validation, positive_labels_count):
     return gap.peek_ap_at_n()
 
 
-def g_a_p2(predictions, Y_validation):
+def g_a_p2(predictions, Y_validation, numpos=None):
     """
     Calculates the global average precision between the predictions and Y_validation arrays.
 
@@ -127,7 +127,10 @@ def g_a_p2(predictions, Y_validation):
         p = predictions[i].argsort()[::-1]
         predictions[i] = predictions[i][p]
         Y_validation[i] = Y_validation[i][p]
-        gap.accumulate(predictions[i][:20], Y_validation[i][:20], num_positives=np.sum(Y_validation[i]))
+        if numpos is None:
+            gap.accumulate(predictions[i][:20], Y_validation[i][:20], num_positives=np.sum(Y_validation[i]))
+        else:
+            gap.accumulate(predictions[i][:20], Y_validation[i][:20], num_positives=numpos[i])
 
     return gap.peek_ap_at_n()
 
