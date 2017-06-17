@@ -1,5 +1,5 @@
 import time
-from code.lib.projectlib import make_train_set,metriccalculation
+from code.lib.projectlib import make_train_set,metriccalculation, hold_out
 from sklearn.svm import LinearSVC,SVC
 from sklearn.multiclass import OneVsRestClassifier
 from sklearn.preprocessing import MultiLabelBinarizer
@@ -21,15 +21,16 @@ original_classes = list(mlb.classes_)
 binlabels, classes, class_frequencies = utl.sort_by_frequency(original_binlabels, original_classes)
 
 truepos = [np.sum(binlabels[x]) for x in range(binlabels.shape[0])]
-print truepos
+# print truepos
 
 # If a label have more than 10 occurences, it is considered
 number_of_labels = utl.last_index_of_freq(class_frequencies, 15)
 
 y_train = binlabels[:, :number_of_labels]
-print y_train[:10]
-print y_train.shape
-print binlabels.shape
+print np.shape(y_train)
+# print y_train[:10]
+# print y_train.shape
+# print binlabels.shape
 
 algorithm = SVC(kernel='linear', probability=True)
 ensemble = BaggingClassifier(algorithm)
@@ -46,10 +47,15 @@ classifier = OneVsRestClassifier(CalibratedClassifierCV(ensemble, cv=2, method='
 # stop = time.time()
 # print scores
 
-classifier.fit(x_train[:150], y_train[:150])
-predictions = classifier.predict_proba(x_train[150:])
-print utl.g_a_p2(predictions, y_train[150:], truepos)
+# classifier.fit(x_train[:150], y_train[:150])
+# predictions = classifier.predict_proba(x_train[150:])
+# print utl.g_a_p2(predictions, y_train[150:], truepos)
 
+
+# a = np.array([[1, 2, 3], [2, 3, 4], [3, 4, 5],[4, 5, 6], [5, 6, 7]])
+# b = np.array([[1, 1, 1], [2, 2, 2], [3, 3, 3], [4, 4, 4], [5, 5, 5]])
+
+print hold_out(OneVsRestClassifier(algorithm), x_train, y_train,truepos=np.array(truepos), iterations=3, split=0.75)
 
 # for i in range(0,20):
 #     for j in range(0, len(predictions[0])):

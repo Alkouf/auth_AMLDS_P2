@@ -4,6 +4,7 @@ import csv
 import json
 
 import numpy as np
+from code.lib.Utils import g_a_p2
 
 from average_precision_calculator import AveragePrecisionCalculator
 
@@ -78,6 +79,29 @@ def make_train_set(path, features_videos, labels, weighted=True):
         x_train = x_train.astype(np.bool).astype(np.int)
 
     return x_train, y_train
+
+
+def hold_out(classifier, data, labels, truepos = None, iterations=10, split=0.75):
+    train_num = int(split*len(data))
+
+    gap = 0.0
+    for i in range(0, iterations):
+        print "iteration: " + i.__str__()
+        p = np.random.permutation(len(data))
+
+        train_x = data[p][:train_num]
+        train_y = labels[p][:train_num]
+
+        test_x = data[p][train_num:]
+        test_y = labels[p][train_num:]
+
+        positives = truepos[p][train_num:]
+        print np.shape(train_x),np.shape(train_y)
+        classifier.fit(train_x, train_y)
+        predictions = classifier.predict_proba(test_x)
+        gap = gap + g_a_p2(predictions, test_y, positives)
+        print gap
+    return gap/iterations
 
 
 '''''
