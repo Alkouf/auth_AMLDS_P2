@@ -2,12 +2,12 @@ import time
 from os.path import join
 import csv
 import json
-
+from sklearn.metrics import make_scorer
 import numpy as np
 from code.lib.Utils import g_a_p2
-
+from sklearn.preprocessing import MultiLabelBinarizer
 from average_precision_calculator import AveragePrecisionCalculator
-
+from sklearn.metrics import f1_score
 
 def readdata(path, frames, labels):
     """
@@ -82,10 +82,12 @@ def make_train_set(path, features_videos, labels, second_features_videos=None, w
         y.append(labels_dict[key])
     x_train = np.array(x)
     y_train = np.array(y)
+    y_train_bin = MultiLabelBinarizer().fit_transform(y_train)
+
     if not weighted:
         x_train = x_train.astype(np.bool).astype(np.int)
 
-    return x_train, y_train
+    return x_train, y_train_bin
 
 
 def hold_out(classifier, data, labels, truepos = None, iterations=10, split=0.75):
@@ -111,4 +113,5 @@ def hold_out(classifier, data, labels, truepos = None, iterations=10, split=0.75
     return gap/iterations
 
 
-def scorer(estimator,x,y):pass
+def scorer():
+    make_scorer(metriccalculation,needs_proba=True)
