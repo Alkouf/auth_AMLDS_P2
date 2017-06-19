@@ -56,7 +56,7 @@ def metriccalculation(predictions, actual_labels, normalize=True):
     return metric
 
 
-def make_train_set(path, features_videos, labels, weighted=True):
+def make_train_set(path, features_videos, labels, second_features_videos=None, weighted=True):
     with open(join(path, labels), "r") as f:
         reader = csv.reader(f)
         labels_list = list(reader)
@@ -68,10 +68,17 @@ def make_train_set(path, features_videos, labels, weighted=True):
     with open(join(path, features_videos), "rb") as f:
         features_dict = json.load(f)
         f.close()
+    if not second_features_videos is None:
+        with open(join(path, second_features_videos), "rb") as f:
+            features_dict_medoids = json.load(f)
+            f.close()
     x = []
     y = []
     for key in features_dict.keys():
-        x.append(features_dict[key])
+        if not second_features_videos is None:
+            x.append(np.hstack((features_dict[key], features_dict_medoids[key])))
+        else:
+            x.append(features_dict[key])
         y.append(labels_dict[key])
     x_train = np.array(x)
     y_train = np.array(y)
@@ -100,7 +107,7 @@ def hold_out(classifier, data, labels, truepos = None, iterations=10, split=0.75
         classifier.fit(train_x, train_y)
         predictions = classifier.predict_proba(test_x)
         gap = gap + g_a_p2(predictions, test_y, positives)
-        print gap
+        print g_a_p2(predictions, test_y, positives)
     return gap/iterations
 
 
