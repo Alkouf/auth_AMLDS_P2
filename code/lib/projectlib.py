@@ -113,5 +113,5 @@ def hold_out(classifier, data, labels, truepos = None, iterations=10, split=0.75
     return gap/iterations
 
 
-def scorer():
-    make_scorer(metriccalculation,needs_proba=True)
+def scorer(metric=metriccalculation):
+    make_scorer(metric,needs_proba=True)
