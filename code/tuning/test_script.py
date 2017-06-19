@@ -76,6 +76,6 @@ print hold_out(classifier, x_train, y_train,truepos=np.array(truepos), iteration
 #     for j in range(0, len(predictions[0])):
 #         print y_train[i][j],
 #     print
-
-
+score= cross_val_score(classifier,x_train,y_train)
+print(score)
 
