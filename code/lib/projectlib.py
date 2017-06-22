@@ -1,13 +1,11 @@
-import time
-from os.path import join
 import csv
 import json
-from sklearn.metrics import make_scorer
+from os.path import join
 import numpy as np
-from code.lib.Utils import g_a_p2
+from sklearn.metrics import make_scorer
 from sklearn.preprocessing import MultiLabelBinarizer
 import average_precision_calculator as GAP
-from sklearn.metrics import f1_score
+
 
 def readdata(path, frames, labels):
     """
