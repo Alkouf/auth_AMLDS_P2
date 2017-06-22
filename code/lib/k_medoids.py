@@ -8,8 +8,8 @@ import json
 
 def calculate_medoid(cluster, distances):
     """
-    From a set of videos (ids) find which one minimizes the average distance to the rest videos.
-    Return the video id that is the medoid of the cluster
+    From a set of videos (ids) (that is a cluster) find which one minimizes the average distance to the rest videos.
+    Return the video id that is the medoid of the cluster.
 
     :return: The id of the video that is the medoid of the cluster
     """
@@ -20,7 +20,6 @@ def calculate_medoid(cluster, distances):
         temp_dist = 0
         for j in range(len(cluster)):
             temp_dist += distances[i, j]
-        # print ids[i], temp_dist
         if temp_dist < mindist:
             mindist = temp_dist
             minid = cluster[i]
@@ -28,6 +27,11 @@ def calculate_medoid(cluster, distances):
 
 
 def sort_to_clusters(medoids, distances):
+    """
+    Given the medoids of the iteration, sort the videos on the clusters, based on hausdorff distance.
+
+    :return: list of lists: Each internal list is a cluster
+    """
     n_vids = distances.shape[0]
     clusters = [[] for i in range(len(medoids))]
     for i in range(n_vids):
@@ -42,31 +46,43 @@ def sort_to_clusters(medoids, distances):
 
 
 def kmedoids(k, distances, iterations=400, random_state=1):
+    """
+    The main method that executes the k medoids algorithm.
+    :return the medoids as numpy array, the clusters as a list of lists
+    """
     n_vids = distances.shape[0]
     np.random.seed(random_state * k)
     medoids = np.random.choice(range(distances.shape[0]), k)
 
-    clusters = sort_to_clusters(medoids, distances)  # vale ta video sta clusters, sumfwna me ta medoids
+    clusters = sort_to_clusters(medoids, distances)
 
     for i in range(iterations):  # !!!
         medoids = [calculate_medoid(clusters[i], distances) for i in range(len(clusters))]
-        clusters = sort_to_clusters(medoids, distances)  # vale ta video sta clusters, sumfwna me ta medoids
+        clusters = sort_to_clusters(medoids, distances)
 
     return medoids, clusters
 
 
 def silh_analysis(medoids, clusters, distances):
+    """
+    Returns the silhouette score given a clustering.
+
+    :return: Silhouette score
+    """
     clst = np.empty(shape=(distances.shape[0],), dtype=int)
     for i in range(len(medoids)):
         for j in range(len(clusters[i])):
             clst[clusters[i][j]] = i
     print clst
     silh_score = silhouette_score(distances, labels=clst, metric="precomputed")
-    # print "silhouette score:", silh_score
     return silh_score
 
 
 def analysis_on_k(distances):
+    """
+    Calculates the Silhouette scores on clusterings, with different number of clusters (k=[2,50]).
+    Also shows the graph.
+    """
     n_k = range(2, 50)
     sils = []
 
@@ -78,14 +94,18 @@ def analysis_on_k(distances):
 
     import matplotlib.pyplot as plt
     plt.plot(n_k, sils)
-    plt.ylabel("Number of clusters")
-    plt.xlabel("Silhouette score")
+    plt.xlabel("Number of clusters")
+    plt.ylabel("Silhouette score")
     plt.title("Silhouette analysis for k-medoids clustering")
-    plt.text(6, .037, r'k=6, score=0.036')  # proxeiro
+    plt.text(6, .037, r'k=6, score=0.036')
     plt.show()
 
 
 def export_data(distances, k=6):
+    """
+    After the k medoids clustering is completed, save the distance of every bag (video) from the k medoids.
+    Those distances are the new features, after the transformation from MIML to SIML.
+    """
     frames, labels = pjlib.readdata("../../data", "frames.csv", "labels.csv")
     videoids = frames.keys()
 
@@ -112,7 +132,7 @@ def export_data(distances, k=6):
 starting_time = time.time()
 distances = pickle.load(open("../../data/Hausdorff.p", 'rb'))
 
-# analysis_on_k(distances)
-export_data(distances, k=6)
+analysis_on_k(distances)
+# export_data(distances, k=6)
 
 print "Duration: ", round(time.time() - starting_time, 3)

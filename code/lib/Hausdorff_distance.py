@@ -1,3 +1,7 @@
+"""
+This files exports (Hausdorff.p) an numpy array of size 200x200 that
+contains the Hausdorff distances between all the videos for future usage on k medoids algorithm.
+"""
 from scipy.spatial.distance import directed_hausdorff
 import projectlib as pjlib
 import time
@@ -8,14 +12,10 @@ import cPickle as pickle
 
 def Hausdorff(A, B):
     """
-    The Hausdorff distance between
-    :param A:
-    :param B:
-    :return:
+    Calculates the Hausdorff distance between a pair of bags (videos), and returns the distance.
     """
     h1 = directed_hausdorff(A, B)[0]
     h2 = directed_hausdorff(B, A)[0]
-    # print h1, h2
     return max((h1, h2))
 
 
@@ -40,7 +40,6 @@ for i in xrange(len(videoids)):
         count += 1
         if count % 100 == 0:
             print "Duration for", count, "pairs:", round(time.time() - starting_time, 3)
-            # print "projected time:", round((time.time()-starting_time)*400, 3)
 
 pickle.dump(hd, open("../../data/Hausdorff.p", 'wb'))
 
