@@ -232,7 +232,7 @@ class AveragePrecisionCalculator(object):
       numpos = min(numpos, n)
     delta_recall = 1.0 / numpos
     poscount = 0.0
-
+    print delta_recall,numpos
     # calculate the ap
     r = len(sortidx)
     if n is not None:

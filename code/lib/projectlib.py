@@ -6,7 +6,7 @@ from sklearn.metrics import make_scorer
 import numpy as np
 from code.lib.Utils import g_a_p2
 from sklearn.preprocessing import MultiLabelBinarizer
-from average_precision_calculator import AveragePrecisionCalculator
+import average_precision_calculator as GAP
 from sklearn.metrics import f1_score
 
 def readdata(path, frames, labels):
@@ -37,23 +37,6 @@ def readdata(path, frames, labels):
 
     return frames_dict, labels_dict
 
-
-def metriccalculation(predictions, actual_labels, normalize=True):
-    """
-    Function metriccalculation calculates the Global Average Precision
-    """
-    start = time.time()
-    calculator = AveragePrecisionCalculator(20)
-    if normalize:
-        for i in range(len(predictions)):
-            calculator.accumulate(AveragePrecisionCalculator._zero_one_normalize(predictions[i]), actual_labels[i])
-    else:
-        for i in range(len(predictions)):
-            calculator.accumulate(predictions[i], actual_labels[i])
-    metric = calculator.peek_ap_at_n()
-    end = time.time()
-    print("Total time for Global Average Prediction: ", end - start)
-    return metric
 
 
 def make_train_set(path, features_videos, labels, second_features_videos=None, weighted=True):
@@ -87,7 +70,7 @@ def make_train_set(path, features_videos, labels, second_features_videos=None, w
     if not weighted:
         x_train = x_train.astype(np.bool).astype(np.int)
 
-    return x_train, y_train_bin
+    return x_train, y_train
 
 
 def hold_out(classifier, data, labels, truepos = None, iterations=10, split=0.75):
@@ -111,6 +94,72 @@ def hold_out(classifier, data, labels, truepos = None, iterations=10, split=0.75
         gap = gap + g_a_p2(predictions, test_y, positives)
         print g_a_p2(predictions, test_y, positives)
     return gap/iterations
+
+
+def sort_by_frequency(binlabels, classes):
+    """
+    Sorts the binlabel matrix (by the frequency on documents), and unpdates the corresponding classes list.
+    Returns tuple, the sorted binlabels, and the corresponding classes list.
+
+    :param binlabels: Dense matrix that has the binarized labels.
+    :param classes: The list that describes the names of the binarized labels
+    :return: Tuple, first the sorted binlabels as numpy array, and second the updated classes list.
+    """
+    f = np.zeros(shape=(binlabels.shape[1]), dtype=int)
+    for i in range(binlabels.shape[1]):
+        f[i] = np.sum(binlabels[:, i])
+    c = zip(binlabels.T, classes)
+    c = zip(f, c)
+    c = sorted(c, key=lambda tup: tup[0], reverse=True)
+    f, c = zip(*c)
+    a, b = zip(*c)
+    return np.array(a).T, list(b), list(f)
+
+
+def last_index_of_freq(frequencies, target):
+    """
+    The frequencies is a list with integer values in descending order, and the method returs the index of the first
+    item with value smaller than the target.
+
+    :param frequencies: list of integer, sorted in decending order
+    :param target: The min allowed value
+    :return: the index of the last item that is larger or equal to the target value
+    """
+    index = 0
+    for i in range(len(frequencies)):
+        if frequencies[i] < target:
+            return index
+        index += 1
+    return index
+
+def metriccalculation(predictions, Y_validation, numpos=None):
+    """
+    Calculates the global average precision between the predictions and Y_validation arrays.
+
+    :param predictions:
+    :param Y_validation:
+    :param positive_labels_count: In case the Y_validation array isn't the complete, this parameter gives the
+        true number of positive labels.
+    :return: The score given by GAP.
+    """
+    if predictions.shape != Y_validation.shape:
+        raise ValueError("Different shapes between 'predictions' and 'Y_validation'")
+    valcases = len(Y_validation)
+    gap = GAP.AveragePrecisionCalculator(20 * valcases)
+
+    predictions = np.array(predictions)
+    Y_validation = np.array(Y_validation)
+
+    for i in range(valcases):
+        p = predictions[i].argsort()[::-1]
+        predictions[i] = predictions[i][p]
+        Y_validation[i] = Y_validation[i][p]
+        if numpos is None:
+            gap.accumulate(predictions[i][:20], Y_validation[i][:20], num_positives=np.sum(Y_validation[i]))
+        else:
+            gap.accumulate(predictions[i][:20], Y_validation[i][:20], num_positives=numpos[i])
+
+    return gap.peek_ap_at_n()
 
 
 def scorer(metric=metriccalculation):
