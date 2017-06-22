@@ -4,7 +4,7 @@ import matplotlib.cm as cm
 from sklearn.metrics import silhouette_samples, silhouette_score
 import numpy as np
 from sklearn.model_selection import train_test_split
-from projectlib import readdata
+from code.lib.projectlib import readdata
 
 percentage=30
 

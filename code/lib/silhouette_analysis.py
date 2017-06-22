@@ -2,13 +2,15 @@ from sklearn.cluster import KMeans
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 from sklearn.metrics import silhouette_samples, silhouette_score
+
 import numpy as np
 from sklearn.model_selection import train_test_split
+
 from projectlib import readdata
 
-percentage=20
+percentage =60
 
-print("Silhouette Analysis using "+str(percentage)+"% of random selected  instances.")
+print("Silhouette Analysis using " + str(percentage) + "% of random selected  instances.")
 frames, labels = readdata("../../data", "frames.csv", "labels.csv")
 
 instances_set = []
@@ -18,12 +20,16 @@ for idv in frames.keys():
         instances_set.append(instance[1:])
 
 instances = np.array(instances_set)
+if percentage != 100:
+    X_rej, X, y_train, y_test = train_test_split(instances, range(len(instances)), test_size=float(percentage) / 100,
+                                                 random_state=42)
+else:
+    X = instances
 
-X_rej, X, y_train, y_test = train_test_split(instances, range(len(instances)), test_size=float(percentage)/100, random_state=42)
 text = ""
-range_n_clusters = [37,54,73,78,81,87,88,90,93]
-dimX = 3
-dimY = 3
+range_n_clusters = range(77, 102)
+dimX = 5
+dimY = 5
 font = {'fontsize': 8, 'fontweight': "normal", 'verticalalignment': 'baseline', 'horizontalalignment': 'center'}
 f, axarr = plt.subplots(dimX, dimY)
 k = 0
@@ -88,7 +94,7 @@ for n_clusters in range_n_clusters:
     axarr[k, t].axvline(x=silhouette_avg, color="red", linestyle="--")
 
     axarr[k, t].set_yticks([])  # Clear the yaxis labels / ticks
-    axarr[k, t].set_xticks([-0.1,  0.5, 1])
+    axarr[k, t].set_xticks([-0.1, 0.5, 1])
 
     if t < dimY - 1:
         t += 1
@@ -97,13 +103,14 @@ for n_clusters in range_n_clusters:
         k += 1
     print k, "----", t
 
-plt.suptitle("Silhouette analysis for KMeans clustering on "+str(percentage)+"% of instances", fontsize=10, fontweight='bold')
-for z in range(0,dimX-1):
+plt.suptitle("Silhouette analysis for KMeans clustering on " + str(percentage) + "% of instances", fontsize=10,
+             fontweight='bold')
+for z in range(0, dimX - 1):
     plt.setp([a.get_xticklabels() for a in axarr[z, :]], visible=False)
 
-plt.setp([a.get_yticklabels() for a in axarr[:, dimY-1]], visible=False)
+plt.setp([a.get_yticklabels() for a in axarr[:, dimY - 1]], visible=False)
 
-with open("silhouette_analysis_results_9_best.txt", "wb") as f:
+with open("silhouette_analysis_results_final_best.txt", "wb") as f:
     f.write(text)
     f.close()
 plt.show()
