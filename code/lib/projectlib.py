@@ -40,6 +40,18 @@ def readdata(path, frames, labels):
 
 
 def make_train_set(path, features_videos, labels, second_features_videos=None, weighted=True):
+    """
+    Returns numpy arrays with the features (x_train), and numpy array with the binarized labels (y_train).
+    The features are from the exported json files that are produced either from instance clustering (k-means)
+    or from bag clustering (k-medoids).
+
+    :param path: The path that contains the json files
+    :param features_videos: The json files with the features
+    :param labels: csv file with the labels
+    :param second_features_videos: (optional) the second file with the features
+    :param weighted: if true then it conserves the arithmetic values, otherwise just binary 1/0
+    :return: the x_train and y_train from the data
+    """
     with open(join(path, labels), "r") as f:
         reader = csv.reader(f)
         labels_list = list(reader)
@@ -71,29 +83,6 @@ def make_train_set(path, features_videos, labels, second_features_videos=None, w
         x_train = x_train.astype(np.bool).astype(np.int)
 
     return x_train, y_train
-
-
-def hold_out(classifier, data, labels, truepos = None, iterations=10, split=0.75):
-    train_num = int(split*len(data))
-
-    gap = 0.0
-    for i in range(0, iterations):
-        print "iteration: " + i.__str__()
-        p = np.random.permutation(len(data))
-
-        train_x = data[p][:train_num]
-        train_y = labels[p][:train_num]
-
-        test_x = data[p][train_num:]
-        test_y = labels[p][train_num:]
-
-        positives = truepos[p][train_num:]
-        print np.shape(train_x),np.shape(train_y)
-        classifier.fit(train_x, train_y)
-        predictions = classifier.predict_proba(test_x)
-        gap = gap + g_a_p2(predictions, test_y, positives)
-        print g_a_p2(predictions, test_y, positives)
-    return gap/iterations
 
 
 def sort_by_frequency(binlabels, classes):
